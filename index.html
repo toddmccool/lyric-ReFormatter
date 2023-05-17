@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text Reformatter</title>
+    <script>
+      function reformatText() {
+        var originalText = document.getElementById("originalText").value;
+        var lines = originalText.split("\n");
+        var reformattedText = "";
+
+        for (var i = 0; i < lines.length; i += 2) {
+          if (i + 1 < lines.length) {
+            var line1 = lines[i].replace(/you/gi, "U").replace(/and/gi, "&");
+            var line2 = lines[i + 1]
+              .replace(/you/gi, "U")
+              .replace(/and/gi, "&");
+            reformattedText += line1 + " " + line2 + "\n";
+          } else {
+            var line = lines[i].replace(/you/gi, "U").replace(/and/gi, "&");
+            reformattedText += line + "\n";
+          }
+
+          if ((i + 2) % 4 === 0) {
+            reformattedText += "\n";
+          }
+        }
+
+        document.getElementById("reformattedText").value = reformattedText;
+      }
+    </script>
+  </head>
+  <body>
+    <label for="originalText">Original Text:</label>
+    <br />
+    <textarea id="originalText" rows="10" cols="100"></textarea>
+    <br />
+    <button onclick="reformatText()">Reformat</button>
+    <br />
+    <label for="reformattedText">Reformatted Text:</label>
+    <br />
+    <textarea id="reformattedText" rows="10" cols="100" readonly></textarea>
+  </body>
+</html>
