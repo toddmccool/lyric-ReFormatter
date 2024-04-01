@@ -2,6 +2,103 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <title>Song Formatter</title>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        function processSongText(inputText) {
+          let sections = inputText.split("\n\n"); // Split by double newline to get sections
+          let formattedSections = sections.map((section) => {
+            let lines = section.split("\n");
+            let formattedLines = [];
+            let chordLine = "";
+            let lyricLines = [];
+
+            lines.forEach((line, index) => {
+              if (line.match(/^\[/)) {
+                // Section label processing with specified abbreviations
+                line = line
+                  .replace(/\[Intro\]/gi, "[i]")
+                  .replace(/\[Verse (\d+)\]/gi, "[v $1]")
+                  .replace(/\[Chorus\]/gi, "[ch]")
+                  .replace(/\[Pre-Chorus\]/gi, "[p]")
+                  .replace(/\[Post-Chorus\]/gi, "[h]")
+                  .toLowerCase();
+                // Append section label to start of a new line if there's existing chordLine, else push directly
+                if (chordLine) {
+                  formattedLines.push(chordLine.trim() + " " + line);
+                  chordLine = ""; // Reset for the next chord sequence
+                } else {
+                  formattedLines.push(line);
+                }
+              } else if (line.match(/^[A-G]/)) {
+                // Accumulate chord notations in a line
+                chordLine += line + "\t";
+              } else {
+                // Line is a lyric line, replace "and" with "&"
+                lyricLines.push(line.replace(/and/g, "&"));
+                // If next line is not a chord or it's the last line of the section,
+                // append the chord and lyrics to formattedLines
+                let nextLineIsChord =
+                  lines[index + 1] && lines[index + 1].match(/^[A-G]/);
+                if (!nextLineIsChord || index === lines.length - 1) {
+                  if (chordLine) {
+                    formattedLines.push(chordLine.trim());
+                    chordLine = ""; // Reset chordLine for the next use
+                  }
+                  if (lyricLines.length > 0) {
+                    formattedLines.push(lyricLines.join(" - "));
+                    lyricLines = []; // Reset lyricLines for the next use
+                  }
+                }
+              }
+            });
+
+            return formattedLines.join("\n");
+          });
+
+          return formattedSections.join("\n\n");
+        }
+
+        function onSubmit() {
+          const inputText = document.getElementById("inputText").value;
+          const processedText = processSongText(inputText);
+          document.getElementById("outputText").value = processedText;
+        }
+
+        document
+          .getElementById("submitButton")
+          .addEventListener("click", onSubmit);
+      });
+    </script>
+  </head>
+  <body>
+    <div>
+      <textarea
+        id="inputText"
+        placeholder="Enter your song here"
+        rows="20"
+        cols="50"
+      ></textarea>
+    </div>
+    <div>
+      <button id="submitButton">Process Song</button>
+    </div>
+    <div>
+      <textarea
+        id="outputText"
+        placeholder="Processed song will appear here"
+        rows="20"
+        cols="50"
+      ></textarea>
+    </div>
+  </body>
+</html>
+
+<!--    OLD CODE........
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Text Reformatter</title>
@@ -44,3 +141,4 @@
     <textarea id="reformattedText" rows="10" cols="100" readonly></textarea>
   </body>
 </html>
+-->
